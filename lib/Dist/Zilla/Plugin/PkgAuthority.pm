@@ -14,15 +14,7 @@ with (
 use namespace::autoclean;
 
 has die_on_existing_authority => (is => 'ro', isa => 'Bool',  default => 0);
-has use_our                   => (is => 'ro', isa => 'Bool',  default => 0);
-has use_begin                 => (is => 'ro', isa => 'Bool',  default => 0);
 has pause_id                  => (is => 'ro', isa => 'Str',  required => 1);
-
-sub BUILD {
-    my ($self) = @_;
-
-    $self->log("use_our option to PkgAuthority is deprecated and will be removed") if $self->use_our;
-}
 
 sub munge_files {
     my ($self) = @_;
@@ -86,12 +78,7 @@ sub munge_perl {
         $self->log("non-ASCII package name is likely to cause problems")
             if $package =~ /\P{ASCII}/;
 
-        my $perl = $self->use_our
-            ? "{ our \$AUTHORITY\x20=\x20'$authority'; }"
-            : "\$$package\::AUTHORITY\x20=\x20'$authority';";
-
-        $self->use_begin and $perl = "BEGIN { $perl }";
-
+        my $perl = "\$$package\::AUTHORITY\x20=\x20'$authority';";
         $self->log_debug([ 'adding $AUTHORTY assignment to %s in %s', $package, $file->name ]);
 
         my $blank;
@@ -193,20 +180,6 @@ used when doing monkey patching or other tricky things.
 
 If true,then when PkgAuthority sees an existing C<$AUTHORITY> assignment, it will
 throw an exception rather than skip the file.  This attribute defaults to false.
-
-=head2 use_our
-
-The idea here was to insert C<< { our $AUTHORITY ='cpan:PAUSEID'; } >> instead of
-C<< $Module::Name::AUTHORITY = 'cpan:PAUSEID'; >>.  It turns out that this causes
-problems with some analyzers.  Use of this feature is deprecated.
-
-Something else will replace it in the future.
-
-=head2 use_begin
-
-If true, the  authority assignment is wrapped in a BEGIN block.  This may help in
-rare cases, such  as when DynaLoader has to be called at BEGIN time, and requires
-AUTHORITY. This option should be needed rarely.
 
 Also note that assigning to C<$AUTHORITY> before the module has finished compiling
 can  lead  to  confused  behavior with attempts to determine whether a module was
