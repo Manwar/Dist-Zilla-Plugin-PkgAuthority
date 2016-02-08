@@ -87,13 +87,14 @@ sub munge_perl {
             if $package =~ /\P{ASCII}/;
 
         my $perl = $self->use_our
-            ? "{ our \$AUTHORITY\x20=\x20'$authority'; }\n"
-            : "\n\n\$$package\::AUTHORITY\x20=\x20'$authority';\n";
+            ? "{ our \$AUTHORITY\x20=\x20'$authority'; }"
+            : "\$$package\::AUTHORITY\x20=\x20'$authority';";
 
         $self->use_begin and $perl = "BEGIN { $perl }";
 
         $self->log_debug([ 'adding $AUTHORTY assignment to %s in %s', $package, $file->name ]);
 
+        my $blank;
         {
             my $curr = $stmt;
             while (1) {
@@ -113,14 +114,25 @@ sub munge_perl {
                     next;
                 }
 
+                if ("$find->[0]" =~ /\A\s*\z/) {
+                    $blank = $find->[0];
+                }
+
                 last;
             }
         }
 
+        $perl = $blank ? "\n$perl\n" : "\n$perl";
         my $bogus_token = PPI::Token::Comment->new($perl);
 
-        Carp::carp("error inserting authority in " . $file->name)
-            unless $stmt->insert_after($bogus_token);
+        if ($blank) {
+          Carp::carp("error inserting authority in " . $file->name)
+              unless $blank->insert_after($bogus_token);
+          $blank->delete;
+        } else {
+            Carp::carp("error inserting authority in " . $file->name)
+                unless $stmt->insert_after($bogus_token);
+        }
 
         $munged = 1;
     }
