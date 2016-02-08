@@ -14,11 +14,9 @@ with (
 use namespace::autoclean;
 
 has die_on_existing_authority => (is => 'ro', isa => 'Bool',  default => 0);
-has die_on_line_insertion     => (is => 'ro', isa => 'Bool',  default => 0);
 has use_our                   => (is => 'ro', isa => 'Bool',  default => 0);
 has use_begin                 => (is => 'ro', isa => 'Bool',  default => 0);
 has pause_id                  => (is => 'ro', isa => 'Str',  required => 1);
-
 
 sub BUILD {
     my ($self) = @_;
@@ -88,31 +86,25 @@ sub munge_perl {
         $self->log("non-ASCII package name is likely to cause problems")
             if $package =~ /\P{ASCII}/;
 
-        $self->log("non-ASCII version is likely to cause problems")
-            if $authority =~ /\P{ASCII}/;
-
-        # the \x20 hack is here so that when we scan *this* document we don't find
-        # an assignment to version; it shouldn't be needed, but it's been annoying
-        # enough in the past that I'm keeping it here until tests are better
         my $perl = $self->use_our
-            ? "{ our \$AUTHORITY\x20=\x20'$authority'; }"
-            : "\$$package\::AUTHORITY\x20=\x20'$authority';";
+            ? "{ our \$AUTHORITY\x20=\x20'$authority'; }\n"
+            : "\n\n\$$package\::AUTHORITY\x20=\x20'$authority';\n";
 
         $self->use_begin and $perl = "BEGIN { $perl }";
 
         $self->log_debug([ 'adding $AUTHORTY assignment to %s in %s', $package, $file->name ]);
 
-        my $blank;
         {
             my $curr = $stmt;
             while (1) {
                 # avoid bogus locations due to insert_after
                 $document->flush_locations if $munged;
                 my $curr_line_number = $curr->line_number + 1;
-                my $find = $document->find(sub {
-                    my $line = $_[1]->line_number;
-                    return $line > $curr_line_number ? undef : $line == $curr_line_number;
-                                           });
+                my $find = $document->find(
+                    sub {
+                        my $line = $_[1]->line_number;
+                        return $line > $curr_line_number ? undef : $line == $curr_line_number;
+                    });
 
                 last unless $find and @$find == 1;
 
@@ -121,32 +113,14 @@ sub munge_perl {
                     next;
                 }
 
-                if ("$find->[0]" =~ /\A\s*\z/) {
-                    $blank = $find->[0];
-                }
-
                 last;
             }
         }
 
-        $perl = $blank ? "$perl\n" : "\n$perl";
-
-        # Why can't I use PPI::Token::Unknown? -- rjbs, 2014-01-11
         my $bogus_token = PPI::Token::Comment->new($perl);
 
-        if ($blank) {
-            Carp::carp("error inserting authority in " . $file->name)
-                unless $blank->insert_after($bogus_token);
-            $blank->delete;
-        } else {
-            my $method = $self->die_on_line_insertion ? 'log_fatal' : 'log';
-            $self->$method([
-                'no blank line for $AUTHORITY after package %s statement in %s line %s',
-                $stmt->namespace, $file->name, $stmt->line_number ]);
-
-            Carp::carp("error inserting authority in " . $file->name)
-                unless $stmt->insert_after($bogus_token);
-        }
+        Carp::carp("error inserting authority in " . $file->name)
+            unless $stmt->insert_after($bogus_token);
 
         $munged = 1;
     }
@@ -203,18 +177,10 @@ used when doing monkey patching or other tricky things.
 
 =head1 ATTRIBUTES
 
-=head2 die_on_existing_version
+=head2 die_on_existing_authority
 
 If true,then when PkgAuthority sees an existing C<$AUTHORITY> assignment, it will
 throw an exception rather than skip the file.  This attribute defaults to false.
-
-=head2 die_on_line_insertion
-
-By default, PkgAuthority  looks for a blank line after each C<package> statement.
-If it finds one, it inserts the C<$AUTHORITY> assignment on that line. If it does
-not, it will  insert a new line, which means the  shipped copy of the module will
-have different line numbers (off by one) than the source. If C<die_on_line_insertion>
-is true, PkgAuthority will raise an exception rather than insert a new line.
 
 =head2 use_our
 
