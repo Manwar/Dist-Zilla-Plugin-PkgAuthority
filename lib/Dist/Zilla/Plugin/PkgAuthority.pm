@@ -113,9 +113,9 @@ sub munge_perl {
         my $bogus_token = PPI::Token::Comment->new($perl);
 
         if ($blank) {
-          Carp::carp("error inserting authority in " . $file->name)
-              unless $blank->insert_after($bogus_token);
-          $blank->delete;
+            Carp::carp("error inserting authority in " . $file->name)
+                unless $blank->insert_after($bogus_token);
+            $blank->delete;
         } else {
             Carp::carp("error inserting authority in " . $file->name)
                 unless $stmt->insert_after($bogus_token);
@@ -155,15 +155,10 @@ in dist.ini
 
 =head1 DESCRIPTION
 
-This plugin will add lines like the following to each package in each Perl module
+This plugin  will add line like the following to each package in each Perl module
 or program (more or less) within the distribution:
 
   $MyModule::AUTHORITY = 'cpan:PAUSEID';
-
-or
-
-  { our $AUTHORITY = 'cpan:PAUSEID'; }
-
 
 It will skip any package declaration that includes a newline between the C<package>
 keyword and the package name, like:
