@@ -27,7 +27,7 @@ my $xsloader_authority = qq{
 };
 
 my $tester = Builder->from_config(
-    { dist_root => 'tester/dist/DZT'  },
+    { dist_root => 't/dist/DZT'  },
     { add_files =>
         {
             'source/lib/DZT/WAuth.pm'         => $with_authority,
