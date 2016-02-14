@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::PkgAuthority;
 
-$Dist::Zilla::Plugin::PkgAuthority::VERSION   = '0.01';
+$Dist::Zilla::Plugin::PkgAuthority::VERSION   = '0.02';
 $Dist::Zilla::Plugin::PkgAuthority::AUTHORITY = 'cpan:MANWAR';
 
 use Moose;
@@ -144,7 +144,7 @@ Dist::Zilla::Plugin::PkgAuthority - Add a $AUTHORITY to your packages.
 
 =head1 VERSION
 
-version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -173,8 +173,9 @@ used when doing monkey patching or other tricky things.
 
 =head2 die_on_existing_authority
 
-If true,then when PkgAuthority sees an existing C<$AUTHORITY> assignment, it will
-throw an exception rather than skip the file.  This attribute defaults to false.
+If true, then when C<Dist::Zilla::Plugin::PkgAuthority> sees an existing C<$AUTHORITY>
+assignment, it  will throw an exception rather than skip the file. This attribute
+defaults to false.
 
 Also note that assigning to C<$AUTHORITY> before the module has finished compiling
 can  lead  to  confused  behavior with attempts to determine whether a module was
@@ -200,7 +201,11 @@ Mohammad S Anwar C<< <mohammad.anwar AT yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/Dist-Zilla-Plugin-PkgAuthority>
+L<https://github.com/manwar/Dist-Zilla-Plugin-PkgAuthority>
+
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::Authority>
 
 =head1 ACKNOWLEDGEMENT
 
