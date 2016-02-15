@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::PkgAuthority;
 
-$Dist::Zilla::Plugin::PkgAuthority::VERSION   = '0.02';
+$Dist::Zilla::Plugin::PkgAuthority::VERSION   = '0.03';
 $Dist::Zilla::Plugin::PkgAuthority::AUTHORITY = 'cpan:MANWAR';
 
 use Moose;
@@ -144,7 +144,7 @@ Dist::Zilla::Plugin::PkgAuthority - Add a $AUTHORITY to your packages.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
