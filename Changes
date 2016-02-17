@@ -1,5 +1,9 @@
 Revision history for Perl extension Dist::Zilla::Plugin::PkgAuthority
 
+0.04  Wed Feb 17 15:50:00 2016
+      - Fixed test failure as reported by CPANTTESTERS:
+        http://www.cpantesters.org/cpan/report/8c1dd347-6bff-1014-946c-fb96f4b0232f
+
 0.03  Mon Feb 15 11:50:00 2016
       - Added missing prereqs as reported by CPANTS.
 
