@@ -1,5 +1,9 @@
 Revision history for Perl extension Dist::Zilla::Plugin::PkgAuthority
 
+0.05  Thu Feb 18 10:10:00 2016
+      - Separated prereqs from test prereqs in the dist.ini.
+      - Added Test::DZil, Test::More and autodie as TestRequires.
+
 0.04  Wed Feb 17 15:50:00 2016
       - Fixed test failure as reported by CPANTTESTERS:
         http://www.cpantesters.org/cpan/report/8c1dd347-6bff-1014-946c-fb96f4b0232f
